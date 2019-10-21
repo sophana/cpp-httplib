@@ -1367,11 +1367,10 @@ public:
       case Z_DATA_ERROR:
       case Z_MEM_ERROR: inflateEnd(&strm); return false;
       }
-
       if (!callback(buff, bufsiz - strm.avail_out)) { return false; }
     } while (strm.avail_out == 0);
 
-    return ret == Z_STREAM_END;
+    return true;
   }
 
 private:

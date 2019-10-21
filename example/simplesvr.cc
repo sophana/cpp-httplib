@@ -8,6 +8,9 @@
 #include <cstdio>
 #include <httplib.h>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <openssl/md5.h>
 
 #define SERVER_CERT_FILE "./cert.pem"
 #define SERVER_PRIVATE_KEY_FILE "./key.pem"
@@ -110,19 +113,32 @@ int main(int argc, const char **argv) {
   });
 
   svr.Post("/multi2", [](Stream& strm, const Request &req, Response &res) {
-    std::string rsp="req body stream is :\n";
+    std::ostringstream rsp;
+    rsp << "req body stream:\n";
+    MD5_CTX ctx;
+    MD5_Init(&ctx);
+    int nCall=0;
 
     detail::read_content(
         strm, req, std::numeric_limits<size_t>::max(), res.status
-    ,   req.progress, [&rsp] (const char *buf, size_t n){
-            rsp+="cut(";
-            rsp.append(buf,n);
-            rsp+=")\n";
+    ,   req.progress, [&] (const char *buf, size_t n){
+            MD5_Update(&ctx, buf, n);
+            nCall++;
             return true;
         }
     );
+    unsigned char result[MD5_DIGEST_LENGTH+1];
 
-    res.set_content(rsp, "text/plain");
+    rsp << "nCall:" << nCall <<std::endl;
+
+    MD5_Final(result, &ctx);
+    rsp << "md5:" ;
+    for(int i =0; i<MD5_DIGEST_LENGTH; i++) {
+        rsp << std::hex << std::setw(2) << std::setfill('0') << (int) result[i];
+    }
+    rsp << std::endl;
+
+    res.set_content(rsp.str(), "text/plain");
   });
 
   svr.set_error_handler([](const Request & /*req*/, Response &res) {

@@ -3,7 +3,7 @@
 CXXFLAGS = -std=c++14 -I.. -Wall -Wextra -pthread
 #OPENSSL_SUPPORT = -DCPPHTTPLIB_OPENSSL_SUPPORT -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lssl -lcrypto
 #OPENSSL_SUPPORT = -DCPPHTTPLIB_OPENSSL_SUPPORT -lssl -lcrypto
-OPENSSL_SUPPORT =
+OPENSSL_SUPPORT = 
 ZLIB_SUPPORT = -DCPPHTTPLIB_ZLIB_SUPPORT -lz
 
 all: server client hello simplesvr redirect benchmark
@@ -18,7 +18,7 @@ hello : hello.cc ../httplib.h Makefile
 	$(CXX) -o hello $(CXXFLAGS) hello.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT)
 
 simplesvr : simplesvr.cc ../httplib.h Makefile
-	$(CXX) -o simplesvr $(CXXFLAGS) simplesvr.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT)
+	$(CXX) -o simplesvr $(CXXFLAGS) simplesvr.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) -lcrypto
 
 redirect : redirect.cc ../httplib.h Makefile
 	$(CXX) -o redirect $(CXXFLAGS) redirect.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT)
